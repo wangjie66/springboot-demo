@@ -1,11 +1,8 @@
-package com.github.domain;
+package com.github.domain.repository;
 
  import com.github.domain.repository.entity.Application;
- import org.apache.ibatis.annotations.Mapper;
- import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
- import org.springframework.stereotype.Repository;
+ import com.github.domain.repository.provider.ApplicationProvider;
+ import org.apache.ibatis.annotations.*;
 
  import java.util.List;
 
@@ -24,4 +21,7 @@ public interface ApplicationMapper {
     })
     @Select("SELECT id,show_name FROM application")
     List<Application> getApplication();
+
+    @InsertProvider(type=ApplicationProvider.class, method = "batchInsert")
+    void addApplication(@Param(value = "list")List<Application> applications);
 }

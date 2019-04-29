@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,13 +21,21 @@ public class HelloWorldController {
     HelloService helloService ;
 
 
-    @RequestMapping(value = "/hello")
-    public String index(){
+    @RequestMapping(value = "/select")
+    public List<Application> select(){
         List<Application> applicationList = helloService.getApplication() ;
-        for(Application application :applicationList){
-            int id = application.getId();
-            String name = application.getShowName();;
-        }
-        return applicationList.size() +"";
+        return applicationList;
+    }
+
+    @RequestMapping(value = "/insert")
+    public void insert(){
+        List<Application> applications = new ArrayList<Application>() ;
+        Application application = new Application();
+        application.setName("app1");
+        applications.add(application) ;
+        application = new Application();
+        application.setName("app2");
+        applications.add(application) ;
+        helloService.addApplication(applications) ;
     }
 }

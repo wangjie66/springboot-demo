@@ -14,4 +14,5 @@ public interface HelloService {
 
     List<Application> getApplication();
 
+    void addApplication(List<Application> applications);
 }
