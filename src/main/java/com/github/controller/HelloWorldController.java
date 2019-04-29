@@ -1,7 +1,12 @@
 package com.github.controller;
 
+import com.github.domain.repository.entity.Application;
+import com.github.service.HelloService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @Author : JieWang
@@ -11,8 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloWorldController {
 
+    @Autowired
+    HelloService helloService ;
+
+
     @RequestMapping(value = "/hello")
     public String index(){
-        return "hello world";
+        List<Application> applicationList = helloService.getApplication() ;
+        for(Application application :applicationList){
+            int id = application.getId();
+            String name = application.getShowName();;
+        }
+        return applicationList.size() +"";
     }
 }
