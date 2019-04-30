@@ -1,6 +1,7 @@
 package com.github.domain.repository.provider;
 
 import com.github.domain.repository.entity.Application;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import java.util.UUID;
  */
 public class ApplicationProvider {
 
-    public String batchInsert(List<Application>  applicationList) {
+    public String batchInsert(@Param(value = "list")List<Application>  applicationList) {
         StringBuffer sql = new StringBuffer("insert into application (app_uuid,name) values ");
 
         for(Application application : applicationList) {
