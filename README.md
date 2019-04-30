@@ -1,2 +1,5 @@
 # springboot-demo
-学习
+
+
+技术栈：
+后端：springboot、mybatis、mysql
