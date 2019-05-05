@@ -27,9 +27,13 @@ public class Swagger2Configuration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))//这是注意的代码
+                .apis(RequestHandlerSelectors.basePackage("com.github.controller")) //生成所有API接口  
                 .paths(PathSelectors.any())
                 .build();
+//                只生成被Api这个注解注解过的类接口            
+//                 .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
+//                 只生成被ApiOperation这个注解注解过的api接口
+//                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
     }
 
     private ApiInfo apiInfo() {
