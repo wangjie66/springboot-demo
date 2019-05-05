@@ -1,8 +1,14 @@
 package com.github.common.page;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageSerializable;
+import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,9 +19,18 @@ import java.util.List;
  */
 public class PageInfo<T> extends PageSerializable<T> {
     //当前页
+    @NotNull
+    @Min(1)
+    @ApiModelProperty(required = true, name = "pageNum", value = "the target page which page numbers")
     private int pageNum;
+
     //每页的数量
+    @NotNull
+    @Min(1)
+    @Max(100)
+    @ApiModelProperty(required = true, name = "pageSize", value = "per page max numbers")
     private int pageSize;
+
     //当前页的数量 <= pageSize
     private int size;
     private int startRow;
@@ -28,10 +43,34 @@ public class PageInfo<T> extends PageSerializable<T> {
     private boolean isLastPage;
     private boolean hasPreviousPage;
     private boolean hasNextPage;
+    @JsonIgnore
     private int navigatePages;
     private int[] navigatepageNums;
     private int navigateFirstPage;
     private int navigateLastPage;
+
+    @ApiModelProperty(value = "sort order")
+    private String order;
+
+    @ApiModelProperty(value = "sort conditions")
+    @Pattern(regexp = "^asc$|^desc$")
+    private String sort;
+
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
+    }
 
     public PageInfo() {
         this.isFirstPage = false;
