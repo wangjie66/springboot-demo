@@ -1,18 +1,15 @@
 package com.github.controller;
 
-import com.github.Swagger2Configuration;
 import com.github.common.page.PageInfo;
+import com.github.common.response.JsonResult;
 import com.github.domain.repository.entity.Application;
 import com.github.service.ApplicationService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.SwaggerDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +19,10 @@ import java.util.List;
  * @Date : Created in 2019年04月29日14:23
  * @Email : wangjie_hf@seczone.cn
  */
-@RestController
-@Api(value = "container", description = "options about application", produces = "application/json",
+
+//@RestController = @Controller && @ResponseBody
+@Controller
+@Api(value = "application", description = "options about application", produces = "application/json",
         consumes = "application/json", tags = {"application"})
 public class ApplicationController {
 
@@ -31,16 +30,24 @@ public class ApplicationController {
     ApplicationService applicationService;
 
 
+    @RequestMapping(value = "/index" ,method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    @ApiOperation(value = "go to index", notes = "跳转页面",httpMethod = "GET")
+    public String index(){
+        return "index";
+    }
+
+
     /**
      * 使用注解查询
      * @return
      */
-    @ApiOperation(value = "select interface", notes = "查询app信息",httpMethod = "GET")
     //@ApiImplicitParam(name = "id", value = "用户id", required=true, dataType = "String")
     @RequestMapping(value = "/select" ,method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public List<Application> select(){
+    @ApiOperation(value = "select interface", notes = "查询app信息",httpMethod = "GET")
+    @ResponseBody
+    public JsonResult select(){
         List<Application> applicationList = applicationService.getApplication() ;
-        return applicationList;
+        return JsonResult.createBySuccess(applicationList);
     }
 
     /**
@@ -48,7 +55,7 @@ public class ApplicationController {
      */
     @RequestMapping(value = "/insert")
     @ApiOperation(value = "select interface", notes = "插入app信息",httpMethod = "POST")
-    public void insert(){
+    public @ResponseBody JsonResult insert(){
         List<Application> applications = new ArrayList<Application>() ;
         for(int i =0 ;i<11 ; i++){
             Application application = new Application();
@@ -56,6 +63,7 @@ public class ApplicationController {
             applications.add(application) ;
         }
         applicationService.addApplication(applications) ;
+        return JsonResult.createBySuccess() ;
     }
 
 
@@ -64,18 +72,21 @@ public class ApplicationController {
      */
     @RequestMapping(value = "/update")
     @ApiOperation(value = "select interface", notes = "修改app信息",httpMethod = "POST")
-    public void update(){
+    @ResponseBody
+    public JsonResult update(){
         Application application = new Application();
         application.setId(1);
         applicationService.updateApplication(application) ;
+        return JsonResult.createBySuccess() ;
     }
 
 
     //http://localhost:8080/selectPage?pageNum=1&pageSize=10
     @ApiOperation(value = "select interface", notes = "分页查询app信息",httpMethod = "GET")
     @RequestMapping(value = "/selectPage")
-    public PageInfo<Application> selectPage(@ModelAttribute PageInfo pageInfo){
+    @ResponseBody
+    public JsonResult selectPage(@Validated PageInfo pageInfo){
         PageInfo<Application> applicationList = applicationService.getApplicationPageList(pageInfo) ;
-        return applicationList;
+        return JsonResult.createBySuccess(applicationList);
     }
 }

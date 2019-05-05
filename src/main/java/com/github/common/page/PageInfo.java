@@ -21,14 +21,14 @@ public class PageInfo<T> extends PageSerializable<T> {
     //当前页
     @NotNull
     @Min(1)
-    @ApiModelProperty(required = true, name = "pageNum", value = "the target page which page numbers")
+    @ApiModelProperty(required = true, name = "pageNum", value = "the target page which page numbers",example = "1")
     private int pageNum;
 
     //每页的数量
     @NotNull
     @Min(1)
     @Max(100)
-    @ApiModelProperty(required = true, name = "pageSize", value = "per page max numbers")
+    @ApiModelProperty(required = true, name = "pageSize", value = "per page max numbers",example = "10")
     private int pageSize;
 
     //当前页的数量 <= pageSize
