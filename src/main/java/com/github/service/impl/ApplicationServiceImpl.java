@@ -1,7 +1,9 @@
 package com.github.service.impl;
 
+import com.github.common.page.PageInfo;
 import com.github.domain.repository.ApplicationMapper;
 import com.github.domain.repository.entity.Application;
+import com.github.pagehelper.PageHelper;
 import com.github.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,5 +35,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public void updateApplication(Application application) {
         applicationMapper.updateApplication(application) ;
+    }
+
+    @Override
+    public PageInfo<Application> getApplicationPageList(PageInfo pageInfo) {
+        PageHelper.startPage(pageInfo.getPageNum(),pageInfo.getPageSize()) ;
+        List<Application>  applicationList = applicationMapper.getApplication() ;
+        PageInfo<Application> pageInfo1 = new PageInfo<Application>(applicationList) ;
+        return pageInfo1 ;
     }
 }

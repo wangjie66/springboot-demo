@@ -1,6 +1,7 @@
 package com.github.service;
 
 
+import com.github.common.page.PageInfo;
 import com.github.domain.repository.entity.Application;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ApplicationService {
     void addApplication(List<Application> applications);
 
     void updateApplication(Application application);
+
+    PageInfo<Application> getApplicationPageList(PageInfo pageInfo);
 }

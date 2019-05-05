@@ -1,5 +1,6 @@
 package com.github.controller;
 
+import com.github.common.page.PageInfo;
 import com.github.domain.repository.entity.Application;
 import com.github.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,11 @@ public class ApplicationController {
     @RequestMapping(value = "/insert")
     public void insert(){
         List<Application> applications = new ArrayList<Application>() ;
-        Application application = new Application();
-        application.setName("app1");
-        applications.add(application) ;
-        application = new Application();
-        application.setName("app2");
-        applications.add(application) ;
+        for(int i =0 ;i<11 ; i++){
+            Application application = new Application();
+            application.setName("testapp"+i);
+            applications.add(application) ;
+        }
         applicationService.addApplication(applications) ;
     }
 
@@ -45,5 +45,12 @@ public class ApplicationController {
         Application application = new Application();
         application.setId(1);
         applicationService.updateApplication(application) ;
+    }
+
+    //http://localhost:8080/selectPage?pageNum=1&pageSize=10
+    @RequestMapping(value = "/selectPage")
+    public PageInfo<Application> selectPage(PageInfo pageInfo){
+        PageInfo<Application> applicationList = applicationService.getApplicationPageList(pageInfo) ;
+        return applicationList;
     }
 }

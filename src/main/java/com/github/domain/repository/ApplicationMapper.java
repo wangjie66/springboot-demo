@@ -26,4 +26,6 @@ public interface ApplicationMapper {
     void addApplication(@Param(value = "list")List<Application> applications);
 
     void updateApplication(Application application);
+
+    void getApplicationPageList();
 }
