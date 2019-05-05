@@ -10,9 +10,11 @@ import java.util.List;
  * @Date : Created in 2019年04月29日15:21
  * @Email : wangjie_hf@seczone.cn
  */
-public interface HelloService {
+public interface ApplicationService {
 
     List<Application> getApplication();
 
     void addApplication(List<Application> applications);
+
+    void updateApplication(Application application);
 }

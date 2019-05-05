@@ -24,4 +24,6 @@ public interface ApplicationMapper {
 
     @InsertProvider(type=ApplicationProvider.class, method = "batchInsert")
     void addApplication(@Param(value = "list")List<Application> applications);
+
+    void updateApplication(Application application);
 }

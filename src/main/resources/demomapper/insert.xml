@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.domain.repository.ApplicationMapper" >
+    <resultMap id="MultipleAppInfoMap" type="cn.seczone.sca.portal.application.controller.vo.AppManageInfoVo">
+        <result column="id" property="appId" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result column="app_uuid" property="uuId" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result column="show_name" property="showName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result column="language" property="language" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result column="path" property="path" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" javaType="java.lang.String" jdbcType="TIMESTAMP"/>
+        <result column="importance" property="importance" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result column="cve_num" property="cveNums" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <result column="lib_num" property="libNums" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <result column="group_uuid" property="groupUuid" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <collection property="containerList" ofType="cn.seczone.sca.portal.container.controller.vo.ContainerListVo">
+            <result column="container_id" property="containerId" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <result column="container_name" property="containerName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        </collection>
+        <collection property="serverList" ofType="cn.seczone.sca.portal.server.controller.vo.ServerListVo">
+            <result column="server_id" property="serverId" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <result column="ip" property="serverName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <result column="host_name" property="hostName" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <insert id="addGroupConfig" parameterType="cn.seczone.sca.portal.group.repository.entity.GroupConfig">
+        INSERT INTO management_group_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="groupId != null">
+                group_id,
+            </if>
+            <if test="orgId != null">
+                org_id,
+            </if>
+            <if test="groupAdminId != null">
+                admin_id,
+            </if>
+            <if test="defaultGroup != null">
+                default_group,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="groupId != null">
+                #{groupId,jdbcType=VARCHAR},
+            </if>
+            <if test="orgId != null">
+                #{orgId,jdbcType=VARCHAR},
+            </if>
+            <if test="groupAdminId != null">
+                #{groupAdminId,jdbcType=VARCHAR},
+            </if>
+            <if test="defaultGroup != null">
+                #{defaultGroup,jdbcType=BOOLEAN},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="addNewJarInfoBatch" parameterType="java.util.List">
+        INSERT INTO jar_info_new
+        (hash,artifact_name,version,group_name,release_date,latest_release_date,latest_version,versions_behind,grade,date_profiled)
+        VALUES
+        <foreach collection ="list" item="jarInfo" index= "index" separator =",">
+            (
+            #{jarInfo.hash}, #{reddemCode.artifactName},#{jarInfo.version},
+            #{jarInfo.groupName},#{jarInfo.releaseDate},#{jarInfo.latestReleaseDate},
+            #{jarInfo.latestVersion},#{jarInfo.versionsBehind},#{jarInfo.grade},
+            #{jarInfo.dateProfiled}
+            )
+        </foreach >
+    </insert>
+
+    <insert id="insertByBatchContainerAndCve" parameterType="java.util.List">
+        insert into container_cve (container_id,cve_number)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            <foreach collection="item.assertUuid" item="item2" index="index" separator=",">
+                (
+                #{item2,jdbcType=VARCHAR},
+                #{item.cveInfo.name,jdbcType=VARCHAR}
+                )
+            </foreach>
+        </foreach>
+    </insert>
+
+    <insert id="addApplication1"  useGeneratedKeys="true" keyColumn="id" keyProperty="id"
+            parameterType="cn.seczone.sca.portal.application.repository.entity.Application">
+        INSERT INTO application
+        (app_uuid,language,name,show_name,path,group_uuid)
+        VALUES
+        (#{appuUid},#{language},#{name},#{showName},#{path},#{groupUuid});
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="recordApplicationTrend" >
+        insert into t_app_trend(app_num, app_cve_num, create_time,group_uuid)
+        select
+        ( select count(*) from application WHERE group_uuid=#{0}) ,
+        ( SELECT count(DISTINCT a.id)  from application  a JOIN  app_app_version aav ON  a.id = aav.app_id
+        JOIN  app_version av  on av.id=aav.appversion_id
+        JOIN  app_version_jar avj on av.id = avj.app_version_id
+        JOIN  jar_info jar on jar.hash = avj.hash
+        join  cpe_cve_table cct  on cct.hash = jar.hash
+        where a.group_uuid = #{0}
+        ORDER BY a.create_time ) ,
+        current_date(),
+        #{0}
+        FROM  dual where not exists(SELECT * from t_app_trend where create_time = current_date())
+    </insert>
+
+    <insert id="addUser" parameterType="cn.seczone.sca.portal.user.repository.entity.User">
+        INSERT INTO t_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userUuid != null">
+                user_uuid,
+            </if>
+            <if test="firstName != null">
+                first_name,
+            </if>
+            <if test="lastName != null">
+                last_name,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="orgId != null and orgId !=0 ">
+                org_id,
+            </if>
+            <if test="groupUuid != null ">
+                group_id,
+            </if>
+            <if test="teamUuid != null ">
+                team_id,
+            </if>
+            role_id
+        </trim>
+        SELECT
+        <if test="userUuid != null">
+            #{userUuid,jdbcType=VARCHAR},
+        </if>
+        <if test="firstName != null">
+            #{firstName,jdbcType=VARCHAR},
+        </if>
+        <if test="lastName != null">
+            #{lastName,jdbcType=VARCHAR},
+        </if>
+        <if test="password != null">
+            #{password,jdbcType=VARCHAR},
+        </if>
+        <if test="email != null">
+            #{email,jdbcType=VARCHAR},
+        </if>
+        <if test="status != null">
+            #{status,jdbcType=INTEGER},
+        </if>
+        <if test="orgId != null and orgId !=0 ">
+            #{orgId,jdbcType=INTEGER},
+        </if>
+        <if test="groupUuid != null ">
+            (select id from t_group where group_uuid = #{groupUuid,jdbcType=VARCHAR}),
+        </if>
+        <if test="teamUuid != null ">
+            (select id from t_team where team_uuid = #{teamUuid,jdbcType=VARCHAR}),
+        </if>
+        <choose>
+            <when test="roleId != null and roleId !=0 ">
+                #{roleId,jdbcType=INTEGER}
+            </when>
+            <otherwise>
+                1
+            </otherwise>
+        </choose>
+    </insert>
+
+
+</mapper>

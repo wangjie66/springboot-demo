@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.domain.repository.ApplicationMapper" >
+
+    <select id="getGroupList" parameterType="cn.seczone.sca.portal.group.controller.vo.GroupVo"
+            resultMap="groupVo,longMap1">
+        SELECT group_uuid groupUuid,group_name groupName,create_time createTime,status,
+        (SELECT count(*) from application a where g.group_uuid = a.group_uuid) appliacationNum ,
+        (SELECT count(*) from t_user u where u.group_id = g.id) userNum
+        FROM  t_group g
+        where g.org_id =#{queryCondition.orgId}
+        <if test="filter!= null">
+            AND g.group_name LIKE #{filter}
+        </if>
+        <if test="order !=null and sort != null">
+            ORDER BY ${order}
+            <if test="sort=='asc'">ASC</if>
+            <if test="sort=='desc'">DESC</if>
+        </if>
+        LIMIT #{start},#{pageSize} ;
+
+        SELECT count(*) FROM t_group g where g.org_id =#{queryCondition.orgId}
+        <if test="filter!= null">
+            AND g.group_name LIKE #{filter}
+        </if> ;
+    </select>
+
+    <select id="getGroupByOrgNumbers" parameterType="cn.seczone.sca.portal.group.controller.vo.GroupVo"
+            resultType="int">
+        select count(mg.id)
+        from management_group mg
+        left join management_group_config mgc
+        on mg.group_id = mgc.group_id
+        <where>
+            mgc.org_id =#{orgId}
+            <if test="pageFilter != null">
+                AND CONCAT(group_name) LIKE #{pageFilter}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOrganizationList" parameterType="cn.seczone.sca.portal.common.page.PageVo"
+            resultType="cn.seczone.sca.portal.org.repository.entity.Organization">
+        SELECT id,org_name AS orgName,org_id AS orgId,admin_id AS adminId,status,
+        create_time AS createTime,modify_time AS modifyTime
+        from management_organization
+        <where>
+            <if test="pageFilter != null">
+                CONCAT(id,org_name) LIKE #{pageFilter}
+            </if>
+        </where>
+        <if test="pageOrder != null">
+            order by ${pageOrder}
+            <if test="pageSort=='asc'">ASC</if>
+            <if test="pageSort=='desc'">DESC</if>
+        </if>
+
+        LIMIT #{pageStart},#{pageSize}
+    </select>
+
+    <select id="getHighRiskTrend" resultMap="appTrend">
+        SELECT * from (
+        SELECT @rownum:=@rownum+1 AS rownum ,t.*
+        FROM (SELECT @rownum:=0) r, t_app_trend t
+        <where>  t.group_uuid in
+            <foreach collection="list" item="item" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+        order by create_time) s
+        where s.rownum%#{avg}=1
+    </select>
+
+
+
+
+</mapper>

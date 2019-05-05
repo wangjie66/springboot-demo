@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.domain.repository.ApplicationMapper" >
+
+    <delete id="deleteGroupConfigByOrgId" parameterType="java.lang.String">
+        delete mgc from management_group_config mgc
+        left join management_organization mo
+        on mgc.org_id = mo.org_id
+        where mo.org_id =#{orgId}
+    </delete>
+
+    <delete id="deleteUserRoleByOrgId" parameterType="java.lang.String">
+        delete murc from management_user_role_config murc
+        left join management_user_config muc
+        on murc.user_role_id = muc.user_id
+        left join management_organization mo
+        on muc.org_id = mo.org_id
+        where
+        mo.org_id =#{orgId}
+    </delete>
+
+    <delete id="deleteJarsBatch">
+        DELETE FROM `app_version_jar` WHERE app_version_id=#{appVersionId} and hash IN
+        <foreach item="hash" collection="deleteList" open="(" separator="," close=")">
+            #{hash}
+        </foreach>
+    </delete>
+
+</mapper>

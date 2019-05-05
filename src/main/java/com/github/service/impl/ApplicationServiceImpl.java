@@ -2,7 +2,7 @@ package com.github.service.impl;
 
 import com.github.domain.repository.ApplicationMapper;
 import com.github.domain.repository.entity.Application;
-import com.github.service.HelloService;
+import com.github.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * @Email : wangjie_hf@seczone.cn
  */
 @Service
-public class HelloServiceImpl implements HelloService {
+public class ApplicationServiceImpl implements ApplicationService {
 
     @Autowired
     ApplicationMapper applicationMapper ;
@@ -28,5 +28,10 @@ public class HelloServiceImpl implements HelloService {
     @Override
     public void addApplication(List<Application> applications) {
         applicationMapper.addApplication(applications);
+    }
+
+    @Override
+    public void updateApplication(Application application) {
+        applicationMapper.updateApplication(application) ;
     }
 }

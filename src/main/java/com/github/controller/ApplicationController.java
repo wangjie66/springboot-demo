@@ -1,7 +1,7 @@
 package com.github.controller;
 
 import com.github.domain.repository.entity.Application;
-import com.github.service.HelloService;
+import com.github.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,15 +15,15 @@ import java.util.List;
  * @Email : wangjie_hf@seczone.cn
  */
 @RestController
-public class HelloWorldController {
+public class ApplicationController {
 
     @Autowired
-    HelloService helloService ;
+    ApplicationService applicationService;
 
 
     @RequestMapping(value = "/select")
     public List<Application> select(){
-        List<Application> applicationList = helloService.getApplication() ;
+        List<Application> applicationList = applicationService.getApplication() ;
         return applicationList;
     }
 
@@ -36,6 +36,14 @@ public class HelloWorldController {
         application = new Application();
         application.setName("app2");
         applications.add(application) ;
-        helloService.addApplication(applications) ;
+        applicationService.addApplication(applications) ;
+    }
+
+
+    @RequestMapping(value = "/update")
+    public void update(){
+        Application application = new Application();
+        application.setId(1);
+        applicationService.updateApplication(application) ;
     }
 }
