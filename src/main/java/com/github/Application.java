@@ -3,6 +3,7 @@ package com.github;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * @Author : JieWang
@@ -10,7 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Email : wangjie_hf@seczone.cn
  */
 @SpringBootApplication(scanBasePackages = "com.github")
-@MapperScan("com.github.domain")
+@MapperScan({"com.github.domain","com.github.common.cache.repository"})
+@EnableCaching
 public class Application {
 
     public static void main(String[] args) {

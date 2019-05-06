@@ -1,8 +1,14 @@
 package com.github;
 
+import com.github.common.util.WildcardUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import io.swagger.annotations.Api;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ClassUtils;
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -27,13 +33,26 @@ public class Swagger2Configuration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.github.controller")) //生成所有API接口  
+                //.apis(basePackage("com.github.*.controller")) //生成所有API接口  
+                .apis(basePackage("com.*.controller")) //生成所有API接口  
                 .paths(PathSelectors.any())
                 .build();
-//                只生成被Api这个注解注解过的类接口            
-//                 .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
-//                 只生成被ApiOperation这个注解注解过的api接口
-//                 .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+//              只生成被Api这个注解注解过的类接口            
+//              .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
+//              只生成被ApiOperation这个注解注解过的api接口
+//              .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+    }
+
+    private static Optional<? extends Class<?>> declaringClass(RequestHandler input) {
+        return Optional.fromNullable(input.declaringClass());
+    }
+
+    public static Predicate<RequestHandler> basePackage(final String basePackage) {
+        return new Predicate<RequestHandler>() {
+            public boolean apply(RequestHandler input) {
+                return (Boolean)declaringClass(input).transform(handlerPackage(basePackage)).or(true);
+            }
+        };
     }
 
     private ApiInfo apiInfo() {
@@ -43,5 +62,16 @@ public class Swagger2Configuration {
                 .termsOfServiceUrl("https://github.com/wangjie66/springboot-demo/blob/master/README.md")
                 .version("1.0")
                 .build();
+    }
+
+
+    private static Function<Class<?>, Boolean> handlerPackage(final String basePackage) {
+        return new Function<Class<?>, Boolean>() {
+            @Override
+            public Boolean apply(Class<?> input) {
+                return WildcardUtils.wildcardEquals(basePackage,ClassUtils.getPackageName(input));
+                //return ClassUtils.getPackageName(input).startsWith(basePackage);
+            }
+        };
     }
 }
